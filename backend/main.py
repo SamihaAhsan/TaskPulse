@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.routers import tasks, teams, assignments, agent
+from routers import tasks, teams, assignments, agent
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="TaskPulse API")
