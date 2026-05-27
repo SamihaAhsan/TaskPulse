@@ -1,0 +1,15 @@
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: taskpulse
+      POSTGRES_PASSWORD: taskpulse_password
+      POSTGRES_DB: taskpulse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
