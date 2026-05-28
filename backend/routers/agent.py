@@ -1,4 +1,5 @@
 import os
+import sys
 from fastapi import APIRouter
 from dotenv import load_dotenv
 from groq import Groq
@@ -6,10 +7,15 @@ from langgraph.graph import StateGraph, END
 from typing import TypedDict, List
 from pydantic import BaseModel
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'mcp'))
+from jira_mcp_adapter import jira_create_issue
+from mcp_server import handle_tool_call
+
 load_dotenv()
 
 router = APIRouter()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 
 # --- State ---
 class AgentState(TypedDict):
@@ -18,6 +24,7 @@ class AgentState(TypedDict):
     assignments: List[dict]
     summary: str
 
+
 # --- Request Models ---
 class Task(BaseModel):
     task_id: str
@@ -25,15 +32,22 @@ class Task(BaseModel):
     required_skill: str
     priority: str
 
+
 class Team(BaseModel):
     team_name: str
     specializations: List[str]
     current_load: int
     max_capacity: int
 
+
 class AssignRequest(BaseModel):
     tasks: List[Task]
     teams: List[Team]
+
+
+class JiraPromptRequest(BaseModel):
+    prompt: str
+
 
 # --- Scoring Node ---
 def assign_tasks(state: AgentState) -> AgentState:
@@ -66,6 +80,7 @@ def assign_tasks(state: AgentState) -> AgentState:
 
     return {**state, "assignments": assignments}
 
+
 # --- LLM Summary Node ---
 def generate_summary(state: AgentState) -> AgentState:
     assignments = state["assignments"]
@@ -93,6 +108,7 @@ Mention workload balance and specialization matching. Keep it professional and c
     summary = response.choices[0].message.content
     return {**state, "summary": summary}
 
+
 # --- Build Graph ---
 def build_agent():
     graph = StateGraph(AgentState)
@@ -103,14 +119,15 @@ def build_agent():
     graph.add_edge("generate_summary", END)
     return graph.compile()
 
+
 agent = build_agent()
 
-# --- Route ---
+
+# --- Routes ---
 @router.post("/assign")
 def assign(request: AssignRequest):
-    # Basic prompt injection guard
     blocked_phrases = ["ignore previous", "forget instructions", "you are now", "disregard", "jailbreak"]
-    
+
     for task in request.tasks:
         for phrase in blocked_phrases:
             if phrase.lower() in task.task_name.lower():
@@ -126,7 +143,40 @@ def assign(request: AssignRequest):
         "summary": ""
     })
 
+    # Create Jira issues for each assignment
+    jira_issues = []
+    for a in result["assignments"]:
+        try:
+            issue = jira_create_issue(
+                summary=a["task_name"],
+                issue_type="Task",
+                priority="High",
+                description=f"Assigned to: {a['assigned_team']}\nScore: {a['score']}\nReason: {a['reason']}"
+            )
+            jira_issues.append({"task": a["task_name"], "jira_key": issue["key"], "url": issue["url"]})
+        except Exception as e:
+            jira_issues.append({"task": a["task_name"], "error": str(e)})
+
     return {
         "assignments": result["assignments"],
-        "summary": result["summary"]
+        "summary": result["summary"],
+        "jira_issues": jira_issues
     }
+
+
+@router.get("/issues")
+def get_jira_issues():
+    issues = handle_tool_call("jira_search_issues", {
+        "jql": "project = KAN ORDER BY updated DESC",
+        "max_results": 20
+    })
+    return {"issues": issues}
+
+
+@router.get("/issues/priority")
+def get_priority_issues():
+    issues = handle_tool_call("jira_search_issues", {
+        "jql": "project = KAN AND priority = Highest AND status != Done ORDER BY updated DESC",
+        "max_results": 10
+    })
+    return {"issues": issues}
