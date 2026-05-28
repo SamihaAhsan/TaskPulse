@@ -99,6 +99,7 @@ http://localhost:3000
 
 Create a `.env` file in backend:
 
+```env
 GROQ_API_KEY=
 DATABASE_URL=
 JIRA_API_KEY=
@@ -106,6 +107,7 @@ JIRA_EMAIL=
 JIRA_BASE_URL=
 LANGFUSE_PUBLIC_KEY=
 LANGFUSE_SECRET_KEY=
+```
 
 ## API Endpoints
 
