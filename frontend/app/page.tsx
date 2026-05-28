@@ -1,13 +1,17 @@
 'use client';
 import { useState } from 'react';
+import AgentChat from './components/AgentChat';
+
 
 const navItems = ['Dashboard', 'Tasks Hub', 'Workforce Planner', 'Demand Forecasting', 'Shift Tracker', 'Reports Hub', 'Skills Pods', 'Settings'];
+
 
 const departments = [
   { name: 'Production & Baking', status: 'Understaffed', statusColor: 'bg-red-100 text-red-600', pending: 312, staff: '38 (84%)', note: '3+ staff needed for peak shift' },
   { name: 'Logistics & Shipping', status: 'Optimal', statusColor: 'bg-green-100 text-green-600', pending: 87, staff: '21 (91%)', note: 'On track' },
   { name: 'Quality & Compliance', status: 'Attention Required', statusColor: 'bg-yellow-100 text-yellow-700', pending: 54, staff: '12 (75%)', note: 'Audit deadline approaching' },
 ];
+
 
 const alerts = [
   { text: 'Croissant line B: output down 22% — maintenance ticket unassigned' },
@@ -16,10 +20,12 @@ const alerts = [
   { text: 'Logistics backlog at 87 orders — avg dispatch delay 34 min' },
 ];
 
+
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [activeNav, setActiveNav] = useState('Dashboard');
+
 
   const handleAssign = async () => {
     setLoading(true);
@@ -34,8 +40,8 @@ export default function Home() {
           { task_id: 'T003', task_name: 'Dispatch overdue logistics orders — batch #4421', required_skill: 'logistics_coordination', priority: 'medium' },
         ],
         teams: [
-          { team_name: 'Ops Alpha', specializations: ['equipment_maintenance', 'production_scheduling'], current_load: 1, max_capacity: 5 },
-          { team_name: 'Quality Squad', specializations: ['quality_control', 'compliance_audit'], current_load: 0, max_capacity: 4 },
+          { team_name: 'Operations', specializations: ['equipment_maintenance', 'production_scheduling'], current_load: 1, max_capacity: 5 },
+          { team_name: 'Quality Assurance', specializations: ['quality_control', 'compliance_audit'], current_load: 0, max_capacity: 4 },
           { team_name: 'Logistics Team', specializations: ['logistics_coordination', 'dispatch'], current_load: 2, max_capacity: 5 },
         ],
       }),
@@ -45,6 +51,7 @@ export default function Home() {
     setLoading(false);
   };
 
+
  return (
   <div>
     {/* Greeting */}
@@ -52,6 +59,7 @@ export default function Home() {
       <h1 className="text-2xl font-bold text-gray-800">Good Afternoon</h1>
       <p className="text-sm text-gray-500">Workforce Intelligence Dashboard — FGF Brands | Current capacity utilization: <span className="text-indigo-600 font-semibold">87%</span></p>
     </div>
+
 
     {/* Stat Cards */}
     <div className="grid grid-cols-5 gap-4 mb-6">
@@ -69,6 +77,7 @@ export default function Home() {
         </div>
       ))}
     </div>
+
 
     {/* Priority Alerts */}
     <div className="bg-white rounded-xl shadow p-5 mb-6">
@@ -88,6 +97,11 @@ export default function Home() {
         ))}
       </div>
     </div>
+
+
+    {/* Agent Chat */}
+    <AgentChat />
+
 
     {/* Smart Task Allocation */}
     <div className="bg-white rounded-xl shadow p-5 mb-6">
@@ -127,6 +141,7 @@ export default function Home() {
         </>
       )}
     </div>
+
 
     {/* Insights & Performance */}
     <div className="bg-white rounded-xl shadow p-5">
