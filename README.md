@@ -155,6 +155,7 @@ taskpulse/
 ├── frontend/  
 ├── agent/     
 ├── infra/     
+├── mcp/  
 ```
 
 
