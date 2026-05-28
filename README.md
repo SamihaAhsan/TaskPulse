@@ -76,8 +76,8 @@ Next.js Frontend → FastAPI Backend → LangGraph Agent (Groq) → MCP Layer �
 ## Quick Start
 
 Clone repository:
-git clone https://github.com/your-org/taskpulse.git
-cd taskpulse
+git clone https://github.com/your-org/TaskPulse.git
+cd TaskPulse
 
 Backend setup:
 cd backend
