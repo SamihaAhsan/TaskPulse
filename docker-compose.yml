@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: taskpulse
+      POSTGRES_PASSWORD: taskpulse_password
+      POSTGRES_DB: taskpulse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://taskpulse:taskpulse_password@postgres:5432/taskpulse_db
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+
+volumes:
+  postgres_data:
