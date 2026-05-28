@@ -144,10 +144,10 @@ Core AI orchestration layer powered by LangGraph + LLM.
 ## Repository Structure
 
 taskpulse/
-├── backend/
-├── frontend/
-├── agent/
-├── infra/
+├── backend/ → FastAPI API layer (core system + routers)
+├── frontend/ → Next.js dashboard UI
+├── agent/ → LangGraph AI orchestration engine
+├── infra/ → MCP servers, integrations, deployment configs
 
 
 
