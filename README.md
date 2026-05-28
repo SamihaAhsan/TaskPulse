@@ -149,10 +149,10 @@ TaskPulse is organized into four core modules:
 
 ```
 taskpulse/
-├── backend/   → FastAPI API layer (core system + routers)
-├── frontend/  → Next.js dashboard UI
-├── agent/     → LangGraph AI orchestration engine
-├── infra/     → MCP servers, integrations, deployment configs
+├── backend/   
+├── frontend/  
+├── agent/     
+├── infra/     
 ```
 
 
